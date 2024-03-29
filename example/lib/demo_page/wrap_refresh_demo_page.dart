@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh_strong/easy_refresh.dart';
+import 'package:flutter_easyrefresh_strong/material_footer.dart';
+import 'package:flutter_easyrefresh_strong/material_header.dart';
 import 'dart:async';
 import 'package:flutter_tableview/flutter_tableview.dart';
 
@@ -6,9 +9,6 @@ import 'package:flutter_tableview/flutter_tableview.dart';
 import 'package:example/demo_tool/route_tool.dart';
 
 //easyrefresh
-import 'package:flutter_easyrefresh/easy_refresh.dart';
-import 'package:flutter_easyrefresh/material_header.dart';
-import 'package:flutter_easyrefresh/material_footer.dart';
 
 class WrapRefreshDemoPage extends StatelessWidget {
   @override
@@ -31,12 +31,12 @@ class WrapRefreshDemoPageBody extends StatefulWidget {
 class _WrapRefreshDemoPageBodyState extends State<WrapRefreshDemoPageBody> {
   //key for flutter_easyrefresh
   //about flutter_easyrefresh : https://github.com/xuelongqy/flutter_easyrefresh
-  GlobalKey<EasyRefreshState> _easyRefreshKey =
-      new GlobalKey<EasyRefreshState>();
-  GlobalKey<RefreshHeaderState> _headerKey =
-      new GlobalKey<RefreshHeaderState>();
-  GlobalKey<RefreshFooterState> _footerKey =
-      new GlobalKey<RefreshFooterState>();
+  GlobalKey _easyRefreshKey =
+      new GlobalKey();
+  GlobalKey _headerKey =
+      new GlobalKey();
+  GlobalKey _footerKey =
+      new GlobalKey();
 
   //if dataSourceList data changed, must call setState(() {});
   List<List<String>> dataSourceList = [
@@ -110,7 +110,7 @@ class _WrapRefreshDemoPageBodyState extends State<WrapRefreshDemoPageBody> {
 
   double _cellHeight(BuildContext context, int section, int row) {
     List<String> sectionDataList = this.dataSourceList[section];
-    double cellHeight = screenWidth / this.widthHeightRatio;
+    double cellHeight = (screenWidth??0) / this.widthHeightRatio;
     cellHeight = row != (sectionDataList.length - 1)
         ? cellHeight
         : cellHeight + this.extraPaddingBottom;
@@ -120,16 +120,15 @@ class _WrapRefreshDemoPageBodyState extends State<WrapRefreshDemoPageBody> {
   Widget _listViewFatherWidgetBuilder(BuildContext context, Widget listView) {
     return EasyRefresh(
       key: _easyRefreshKey,
-      limitScroll: true,
-      refreshHeader: MaterialHeader(key: _headerKey),
-      refreshFooter: MaterialFooter(key: _footerKey),
+      header: MaterialHeader(key: _headerKey),
+      footer: MaterialFooter(key: _footerKey),
       onRefresh: () async {
         print('onrefresh');
         await Future.delayed(Duration(seconds: 2));
         this.dataSourceList = this.dataSourceList.reversed.toList();
         setState(() {});
       },
-      loadMore: () async {
+      onLoad: () async {
         print('loadMore');
         setState(() {});
       },
